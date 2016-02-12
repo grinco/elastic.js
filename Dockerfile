@@ -6,8 +6,19 @@ WORKDIR /usr/src/app
 
 # Install app dependencies
 COPY package.json /usr/src/app/
-RUN npm install
-RUN npm install synaptic --save
+
+# Create a directory to export via http
+RUN mkdir /usr/src/app/public/
+RUN echo '<script src="synaptic.js"></script>' > /usr/src/app/public/index.html
+
+# will install all necessary libraries
+RUN npm install express connect compression serve-static cookie-session synaptic --save
+
+# We will need those for future.
+RUN cp /usr/src/app/node_modules/synaptic/dist/*.js /usr/src/app/public/
+
+# Check the contents...
+RUN find
 
 # Bundle app source
 COPY . /usr/src/app
