@@ -12,7 +12,7 @@ RUN mkdir /usr/src/app/public/
 RUN echo '<script src="synaptic.js"></script>' > /usr/src/app/public/index.html
 
 # will install all necessary libraries
-RUN npm install express connect compression serve-static cookie-session synaptic --save
+RUN npm install
 
 # We will need those for future.
 RUN cp /usr/src/app/node_modules/synaptic/dist/*.js /usr/src/app/public/
