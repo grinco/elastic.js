@@ -1,85 +1,10 @@
 'use strict';
 
+
 // Listener port
 var PORT = 8080;
 
-// Init synaptic
-var synaptic = require('synaptic');
-var Neuron = synaptic.Neuron,
-    Layer = synaptic.Layer,
-    Network = synaptic.Network,
-    Trainer = synaptic.Trainer,
-    Architect = synaptic.Architect;
-
-function Perceptron(input, hidden, output)
-{
-    // create the layers
-    var inputLayer = new Layer(input);
-    var hiddenLayer = new Layer(hidden);
-    var outputLayer = new Layer(output);
-
-    // connect the layers
-    inputLayer.project(hiddenLayer);
-    hiddenLayer.project(outputLayer);
-
-    // set the layers
-    this.set({
-        input: inputLayer,
-        hidden: [hiddenLayer],
-        output: outputLayer
-    });
-}
-
-// extend the prototype chain
-Perceptron.prototype = new Network();
-Perceptron.prototype.constructor = Perceptron;
-
-function LSTM(input, blocks, output)
-{
-    // create the layers
-    var inputLayer = new Layer(input);
-    var inputGate = new Layer(blocks);
-    var forgetGate = new Layer(blocks);
-    var memoryCell = new Layer(blocks);
-    var outputGate = new Layer(blocks);
-    var outputLayer = new Layer(output);
-
-    // connections from input layer
-    var input = inputLayer.project(memoryCell);
-    inputLayer.project(inputGate);
-    inputLayer.project(forgetGate);
-    inputLayer.project(outputGate);
-
-    // connections from memory cell
-    var output = memoryCell.project(outputLayer);
-
-    // self-connection
-    var self = memoryCell.project(memoryCell);
-
-    // peepholes
-    memoryCell.project(inputGate);
-    memoryCell.project(forgetGate);
-    memoryCell.project(outputGate);
-
-    // gates
-    inputGate.gate(input, Layer.gateType.INPUT);
-    forgetGate.gate(self, Layer.gateType.ONE_TO_ONE);
-    outputGate.gate(output, Layer.gateType.OUTPUT);
-
-    // input to output direct connection
-    inputLayer.project(outputLayer);
-
-    // set the layers of the neural network
-    this.set({
-        input: inputLayer,
-        hidden: [inputGate, forgetGate, memoryCell, outputGate],
-        output: outputLayer
-    });
-}
-
-// extend the prototype chain
-LSTM.prototype = new Network();
-LSTM.prototype.constructor = LSTM;
+var bodyParser = require('body-parser');
 
 var express = require('express');
 var connect = require('connect');
@@ -91,11 +16,14 @@ var app = express();
 // gzip/deflate outgoing responses
 var compression = require('compression');
 app.use(compression());
-
 // store session state in browser cookie
 var cookieSession = require('cookie-session');
 app.use(cookieSession({
     keys: ['secret1', 'secret2']
+}));
+
+app.use(bodyParser.urlencoded({
+    extended: true
 }));
 
 // default response
@@ -109,6 +37,41 @@ app.use(serveStatic(__dirname + '/public', {'index': ['index.html']}))
 
 //create node.js http server and listen on port
 app.listen(PORT);
+
+//Martin's part
+//set variables
+var x1 = 0;
+var x2 = 0;
+var baist = 1;
+var baistweight = -30;
+var x1weight = 20;
+var x2weight = 20;
+var result = 0;
+
+//get data from formular
+app.post('/and', function(request,response) {
+  x1 = parseInt(request.body.x1);
+  x2 = parseInt(request.body.x2);
+  result = baistweight + x1weight * x1 + x2weight * x2;
+  if(result < 0) {
+    result = 0;
+  }
+  else{
+    result = 1;
+  }
+  //send result
+  response.send("Result is: "+result);
+
+});
+app.post('/myaction2', function(request, response){
+    console.log(request.body.user.name);
+    console.log(request.body.user.email);
+});
+
+
+
+
+
 
 console.log('Running on http://localhost:' + PORT);
 
