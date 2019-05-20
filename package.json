@@ -10,7 +10,7 @@
   "dependencies": {
     "express": "^4.13.3",
     "synaptic": "~1.0.2",
-    "connect": "~3.4.1",
+    "connect": "~3.7.0",
     "compression": "~1.6.1",
     "cookie-session": "~2.0.0-alpha.1",
     "serve-static": "~1.10.2",
